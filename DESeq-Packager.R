@@ -12,7 +12,9 @@ setwd("/Users/AG/R/expr_tsv")
 
 #vector of files and their names
 files <- c("RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv", "RNA_EWS-FLI1_Low_rep1.tsv", "RNA_EWS-FLI1_Low_rep2.tsv")
+files2 <- c("RNA_EWS-FLI1_High_DMSO_rep1.tsv", "RNA_EWS-FLI1_High_DMSO_rep2.tsv", "RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv")
 type <- c("High1", "High2", "Low1", "Low2")
+type2 <- c("HighDMSO1", "HighDMSO2", "High1", "High2")
 
 
 #function to read in the files
@@ -33,7 +35,7 @@ setup_datafiles <- function(file_vector, type){
 
 #run the function on the given list
 list_files <- setup_datafiles(files, type)
-
+list_files2 <- setup_datafiles(files2, type2)
 
 #function to merge the datatables in the list
 merging <- function(list){
@@ -46,16 +48,19 @@ merging <- function(list){
 
 #run the merge function
 countTable <- merging(list_files)
+countTable2 <- merging(list_files2)
 #remove the names of the genes
 countTable <- countTable[,2:ncol(countTable)]
-
+countTable2 <- countTable2[,2:ncol(countTable2)]
 
 #set the conditions......this could be passed in as a parameter to an enclosing function
 condition <- factor(c("knockout", "knockout", "control", "control"))
+condition2 <- factor(c("treatment", "treatment", "control", "control"))
 
 #run DESeq analysis
 cds <- newCountDataSet(countTable, condition)
-cds <- estimateSizeFactors(cds)
+cds2 <- newCountDataSet(countTable2, condition2)
+cds2 <- estimateSizeFactors(cds2)
 
 cds <- estimateDispersions(cds, fitType = "local")
 plotDispEsts(cds)
