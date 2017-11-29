@@ -31,17 +31,13 @@ setup_datafiles <- function(file_vector, type, gene_name_col, relevant_data_col)
     
     dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data (FPKM)
     
-    dt <- dt[, FPKM:=as.integer(FPKM)] #convert the FPKM data to integers for DESeq
-    ######make this part accept relevant_data_col parameter
+    dt[[2]] <- as.integer(dt[[2]]) #convert the FPKM data to integers, required for DESeq
     
-    dt <- rename(dt, replace = c(FPKM = paste(type[i], "FPKM", sep = "_"))) #rename columns in datatable to the type of data ex: HighDMSO1_FPKM
-    ######also make this part accept relevant_data_col parameter
+    names(dt)[2] <- paste(type[i], relevant_data_col, sep = "_") #rename columns in datatable to the type of data (ex: HighDMSO1_FPKM)
     
     output[[i]] <- dt #add datatable to the list
     
-    names(output)[i] <- file
-    
-    i <- i+1
+    i <- i+1 #increment to access the next element in the type vector
   }
   return(output)
 }
