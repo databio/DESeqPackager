@@ -10,36 +10,48 @@ library("DESeq")
 setwd("/Users/AG/R/expr_tsv")
 
 
-#vector of files and their names
-files <- c("RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv", "RNA_EWS-FLI1_Low_rep1.tsv", "RNA_EWS-FLI1_Low_rep2.tsv")
-files2 <- c("RNA_EWS-FLI1_High_DMSO_rep1.tsv", "RNA_EWS-FLI1_High_DMSO_rep2.tsv", "RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv")
-type <- c("High1", "High2", "Low1", "Low2")
-type2 <- c("HighDMSO1", "HighDMSO2", "High1", "High2")
+####parameters
+
+#files <- c("RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv", "RNA_EWS-FLI1_Low_rep1.tsv", "RNA_EWS-FLI1_Low_rep2.tsv")
+files <- c("RNA_EWS-FLI1_High_DMSO_rep1.tsv", "RNA_EWS-FLI1_High_DMSO_rep2.tsv", "RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv")
+#type <- c("High1", "High2", "Low1", "Low2")
+type <- c("HighDMSO1", "HighDMSO2", "High1", "High2")
+
+gene_name_col <- "ensembl_gene_id"
+relevant_data_col <- "FPKM"
 
 
-#function to read in the files
-setup_datafiles <- function(file_vector, type){
-  output <- vector(mode = "list", length = length(file_vector))
+####function to read in the files
+setup_datafiles <- function(file_vector, type, gene_name_col, relevant_data_col){
+  output <- vector(mode = "list", length = length(file_vector)) #creates empty list
+  
   i <- 1
   for(file in file_vector){
     dt <- fread(file)
-    dt <- subset(dt, select = c("ensembl_gene_id", "FPKM"))
-    dt <- dt[, FPKM:=as.integer(FPKM)]
-    dt <- rename(dt, replace = c("FPKM" = paste(type[i], "FPKM", sep = "_")))
-    output[[i]] <- dt
+    
+    dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data (FPKM)
+    
+    dt <- dt[, FPKM:=as.integer(FPKM)] #convert the FPKM data to integers for DESeq
+    ######make this part accept relevant_data_col parameter
+    
+    dt <- rename(dt, replace = c(FPKM = paste(type[i], "FPKM", sep = "_"))) #rename columns in datatable to the type of data ex: HighDMSO1_FPKM
+    ######also make this part accept relevant_data_col parameter
+    
+    output[[i]] <- dt #add datatable to the list
+    
     names(output)[i] <- file
+    
     i <- i+1
   }
   return(output)
 }
 
-#run the function on the given list
-list_files <- setup_datafiles(files, type)
-list_files2 <- setup_datafiles(files2, type2)
+#run the function and form a list of the given files
+list_files <- setup_datafiles(files, type, gene_name_col, relevant_data_col)
 
 #function to merge the datatables in the list
 merging <- function(list){
-  countTable <- merge(list[[1]], list[[2]], by = "ensembl_gene_id")
+  countTable <- merge(list[[1]], list[[2]], by = gene_name_col)
   for(i in 3:length(list)){
     countTable <- merge(countTable, list[[i]])
   }
@@ -48,14 +60,14 @@ merging <- function(list){
 
 #run the merge function
 countTable <- merging(list_files)
-countTable2 <- merging(list_files2)
 #remove the names of the genes
 countTable <- countTable[,2:ncol(countTable)]
-countTable2 <- countTable2[,2:ncol(countTable2)]
 
 #set the conditions......this could be passed in as a parameter to an enclosing function
 condition <- factor(c("knockout", "knockout", "control", "control"))
 condition2 <- factor(c("treatment", "treatment", "control", "control"))
+
+
 
 #run DESeq analysis
 cds <- newCountDataSet(countTable, condition)
