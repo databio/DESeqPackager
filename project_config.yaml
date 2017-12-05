@@ -1,0 +1,3 @@
+metadata:
+ output_dir: /path/to/output/folder
+ sample_annotation: ews_patients/metadata/table_experiments_RNA.csv
