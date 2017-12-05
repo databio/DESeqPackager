@@ -1,0 +1,21 @@
+sample_id,sample_name,rep,ews_fli1,treatment_dox,treatment_drug,library,instrument_model,read_length,single_or_paired,cell_line, data_source
+ews_line_1,A673_1,1,High,No,No,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_2,2,High,No,No,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_3,1,Low,Yes,No,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_4,2,Low,Yes,No,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_5,1,High,No,DMSO,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_6,2,High,No,DMSO,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_7,1,Low,Yes,DMSO,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_8,2,Low,Yes,DMSO,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_9,1,High,No,Romidepsin,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_10,2,High,No,Romidepsin,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_11,1,Low,Yes,Romidepsin,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_12,2,Low,Yes,Romidepsin,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_13,1,High,No,Vorinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_14,2,High,No,Vorinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_15,1,Low,Yes,Vorinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_16,2,Low,Yes,Vorinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_17,1,High,No,Entinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_18,2,High,No,Entinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_19,1,Low,Yes,Entinostat,RNA,Hiseq 2000,50,single,A673, source1
+ews_line_1,A673_20,2,Low,Yes,Entinostat,RNA,Hiseq 2000,50,single,A673, source1
