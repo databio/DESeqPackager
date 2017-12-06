@@ -1,8 +1,10 @@
-metadata:
-	output_dir: output_results
-	sample_annotation: table_experiments_RNA.csv
-
 derived_columns: [data_source]
 
 data_sources:
-	source1: /Users/AG/Documents/Github/DESeq-Packager/expr_tsv/RNA_EWS-FLI1_{ews_fli1}_rep{rep}.tsv
+  source1: "/Users/AG/Documents/Github/DESeq-Packager/expr_tsv/RNA_EWS-FLI1_rep{rep}.tsv"
+#using variable name:
+#${___}/RNA_EWS-FLI1_{ews_fli1}_rep{rep}.tsv
+
+metadata:
+  output_dir: /Users/AG/Documents/Github/DESeq-Packager/output_results
+  sample_annotation: /Users/AG/Documents/Github/DESeq-Packager/table_experiments_RNA.csv
