@@ -6,11 +6,8 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq")
 library("DESeq")
 
-#What do I do with the working directory?
-setwd("/Users/AG/R/expr_tsv")
 
-
-####parameters
+####testing parameters
 
 #files <- c("RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv", "RNA_EWS-FLI1_Low_rep1.tsv", "RNA_EWS-FLI1_Low_rep2.tsv")
 files <- c("RNA_EWS-FLI1_High_DMSO_rep1.tsv", "RNA_EWS-FLI1_High_DMSO_rep2.tsv", "RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv")
@@ -29,9 +26,9 @@ setup_datafiles <- function(file_vector, type, gene_name_col, relevant_data_col)
   for(file in file_vector){
     dt <- fread(file)
     
-    dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data (FPKM)
+    dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data
     
-    dt[[2]] <- as.integer(dt[[2]]) #convert the FPKM data to integers, required for DESeq
+    dt[[2]] <- as.integer(dt[[2]]) #convert the data to integers, required for DESeq
     
     names(dt)[2] <- paste(type[i], relevant_data_col, sep = "_") #rename columns in datatable to the type of data (ex: HighDMSO1_FPKM)
     
