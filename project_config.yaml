@@ -3,7 +3,7 @@ derived_columns: [data_source]
 data_sources:
   source1: "/Users/AG/Documents/Github/DESeq-Packager/expr_tsv/RNA_EWS-FLI1_{ews_fli1}_{treatment_drug}_rep{rep}.tsv"
   #using variable name:
-  #${___}/RNA_EWS-FLI1_{ews_fli1}_rep{rep}.tsv
+  #${PROCESSED}/...../RNA_EWS-FLI1_{ews_fli1}_rep{rep}.tsv
 
 metadata:
   output_dir: /Users/AG/Documents/Github/DESeq-Packager/output_results

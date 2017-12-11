@@ -1,19 +1,23 @@
-install.packages(c("readr", "data.table", "plyr"))
-library("readr")
+install.packages("data.table")
 library("data.table")
-library("plyr")
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq")
 library("DESeq")
 
+####importing pepr project
+devtools::install_github("pepkit/pepr")
+library(pepr)
+p <- Project(file = "project_config.yaml")
+sample_frame <- samples(p)
 
-####testing parameters
+####parameters
 
-#files <- c("RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv", "RNA_EWS-FLI1_Low_rep1.tsv", "RNA_EWS-FLI1_Low_rep2.tsv")
-files <- c("RNA_EWS-FLI1_High_DMSO_rep1.tsv", "RNA_EWS-FLI1_High_DMSO_rep2.tsv", "RNA_EWS-FLI1_High_rep1.tsv", "RNA_EWS-FLI1_High_rep2.tsv")
-#type <- c("High1", "High2", "Low1", "Low2")
-type <- c("HighDMSO1", "HighDMSO2", "High1", "High2")
+files <- sample_frame[ , data_source]
 
+
+type <- paste(sample_frame[, ews_fli1], sample_frame[ , treatment_drug], sample_frame[ , rep], sep = "")
+
+####User specified parameters
 gene_name_col <- "ensembl_gene_id"
 relevant_data_col <- "FPKM"
 
@@ -54,7 +58,8 @@ merging <- function(list){
 #run the merge function
 countTable <- merging(list_files)
 #remove the names of the genes
-countTable <- countTable[,2:ncol(countTable)]
+row.names(countTable) <- countTable$gene_name_col
+countTable <- countTable[,-1]
 
 #set the conditions......this could be passed in as a parameter to an enclosing function
 condition <- factor(c("knockout", "knockout", "control", "control"))
