@@ -13,8 +13,8 @@ sample_frame <- samples(p)
 ####parameters
 
 files <- sample_frame[ , data_source]
-
-
+#need to write intelligible column names based on treatment
+#how to do this? user input?
 type <- paste(sample_frame[, ews_fli1], sample_frame[ , treatment_drug], sample_frame[ , rep], sep = "")
 
 ####User specified parameters
@@ -22,22 +22,33 @@ gene_name_col <- "ensembl_gene_id"
 relevant_data_col <- "FPKM"
 
 
+
 ####function to read in the files
 setup_datafiles <- function(file_vector, type, gene_name_col, relevant_data_col){
   output <- vector(mode = "list", length = length(file_vector)) #creates empty list
   
+  sampleReadFunc=read.table
+  #use data table if it is installed
+  # if (requireNamespace("data.table")) {
+  #   sampleReadFunc = data.table::fread
+  # } else {
+  #   sampleReadFunc = read.table
+  # }
+  
   i <- 1
   for(file in file_vector){
-    dt <- fread(file)
     
-    dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data
+    sampleTable <- sampleReadFunc(file, header = TRUE)
+    sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
     
-    dt[[2]] <- as.integer(dt[[2]]) #convert the data to integers, required for DESeq
+    #dt <- fread(file)
+    #dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data
     
-    names(dt)[2] <- paste(type[i], relevant_data_col, sep = "_") #rename columns in datatable to the type of data (ex: HighDMSO1_FPKM)
+    sampleTable[[2]] <- as.integer(sampleTable[[2]]) #convert the data to integers, required for DESeq
     
-    output[[i]] <- dt #add datatable to the list
+    names(sampleTable)[2] <- paste(type[i], relevant_data_col, sep = "_") #rename columns in datatable to the type of data (ex: HighDMSO1_FPKM)
     
+    output[[i]] <- sampleTable #add datatable to the list
     i <- i+1 #increment to access the next element in the type vector
   }
   return(output)
@@ -52,14 +63,16 @@ merging <- function(list){
   for(i in 3:length(list)){
     countTable <- merge(countTable, list[[i]])
   }
+  
+  #set the row names as the gene names, then remove the gene name column
+  row.names(countTable) <- countTable[[1]]
+  countTable[,1] <- NULL
   return(countTable)
 }
 
 #run the merge function
 countTable <- merging(list_files)
-#remove the names of the genes
-row.names(countTable) <- countTable$gene_name_col
-countTable <- countTable[,-1]
+
 
 #set the conditions......this could be passed in as a parameter to an enclosing function
 condition <- factor(c("knockout", "knockout", "control", "control"))
