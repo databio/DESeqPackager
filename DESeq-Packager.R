@@ -4,75 +4,51 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq")
 library("DESeq")
 
-####importing pepr project
+#importing pepr project
 devtools::install_github("pepkit/pepr")
 library(pepr)
 p <- Project(file = "project_config.yaml")
 sample_frame <- samples(p)
-
-####parameters
-
 files <- sample_frame[ , data_source]
-#need to write intelligible column names based on treatment
-#how to do this? user input?
-type <- paste(sample_frame[, ews_fli1], sample_frame[ , treatment_drug], sample_frame[ , rep], sep = "")
 
-####User specified parameters
-gene_name_col <- "ensembl_gene_id"
-relevant_data_col <- "FPKM"
-
-
-
-####function to read in the files
-setup_datafiles <- function(file_vector, type, gene_name_col, relevant_data_col){
-  output <- vector(mode = "list", length = length(file_vector)) #creates empty list
-  
-  sampleReadFunc=read.table
-  #use data table if it is installed
-  # if (requireNamespace("data.table")) {
-  #   sampleReadFunc = data.table::fread
-  # } else {
-  #   sampleReadFunc = read.table
-  # }
-  
-  i <- 1
-  for(file in file_vector){
-    
-    sampleTable <- sampleReadFunc(file, header = TRUE)
-    sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
-    
-    #dt <- fread(file)
-    #dt <- subset(dt, select = c(gene_name_col, relevant_data_col)) #leave only the geneID and the relevant data
-    
-    sampleTable[[2]] <- as.integer(sampleTable[[2]]) #convert the data to integers, required for DESeq
-    
-    names(sampleTable)[2] <- paste(type[i], relevant_data_col, sep = "_") #rename columns in datatable to the type of data (ex: HighDMSO1_FPKM)
-    
-    output[[i]] <- sampleTable #add datatable to the list
-    i <- i+1 #increment to access the next element in the type vector
+#prompting user to rename files 
+parameters <- c()
+while(TRUE){
+  s <- readline(prompt= "Rename each file with sample identifiers (Type DONE when finished): ")
+  if(s=="DONE"){
+    rm(s)
+    break
   }
-  return(output)
+  parameters <- c(parameters, s)
 }
+type <- c()
+for(column in parameters){
+  type <- paste(type, sample_frame[, get(column)], sep = "")
+}
+rm(parameters, column)
 
-#run the function and form a list of the given files
-list_files <- setup_datafiles(files, type, gene_name_col, relevant_data_col)
+#prompting user to specify columns for DESeq Analysis
+gene_name_col <- readline(prompt= "Specify which column in each data table is the gene name column: ")
+relevant_data_col <- readline(prompt= "Specify which column is the relevant data for DESeq analysis: ")
+
+#reading in the files
+df_list <- vector(mode="list", length=length(files))
+for(i in 1:length(files)){
+  sampleTable <- read.table(files[i], header = TRUE)
+  sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
+  sampleTable[[2]] <- as.integer(sampleTable[[2]]) #integers are required for DESeq
+  names(sampleTable)[2] <- paste(type[i], relevant_data_col, sep = "_")
+  df_list[[i]] <- sampleTable
+}
 
 #function to merge the datatables in the list
-merging <- function(list){
-  countTable <- merge(list[[1]], list[[2]], by = gene_name_col)
-  for(i in 3:length(list)){
-    countTable <- merge(countTable, list[[i]])
-  }
-  
-  #set the row names as the gene names, then remove the gene name column
-  row.names(countTable) <- countTable[[1]]
-  countTable[,1] <- NULL
-  return(countTable)
+countTable <- merge(df_list[[1]], df_list[[2]], by=gene_name_col)
+for(i in 3:length(df_list)){
+  countTable <- merge(countTable, df_list[[i]])
 }
-
-#run the merge function
-countTable <- merging(list_files)
-
+#set the row names as the gene names, then remove the gene name column
+row.names(countTable) <- countTable[[1]]
+countTable[,1] <- NULL
 
 #set the conditions......this could be passed in as a parameter to an enclosing function
 condition <- factor(c("knockout", "knockout", "control", "control"))
