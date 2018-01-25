@@ -1,11 +1,7 @@
-source("https://bioconductor.org/biocLite.R")
-biocLite("DESeq")
-library("DESeq")
-
 #' packages multiple data tables into one data frame for DESeq analysis
 #'
 #' @param yaml file path to project's yaml
-#' @return countTable, the data structure needed to input into DESeq
+#' @return countTable, the data structure needed for DESeq
 #' @export
 DESeq_table_maker <- function(yaml, data_source){
   
@@ -52,9 +48,14 @@ countTable <- DESeq_table_maker("Documents/GitHub/DESeq-Packager/project_config.
 
 
 #-----------------DESeq Analysis-------------------------#
-#set the conditions......this could be passed in as a parameter to an enclosing function
+#the user will conduct the DESeq analysis themselves
+#this code is for my testing purposes
+source("https://bioconductor.org/biocLite.R")
+biocLite("DESeq")
+library("DESeq")
+
+
 condition <- factor(c("controlDMSO","controlDMSO","knockoutDMSO","knockoutDMSO"))
-#run DESeq analysis
 cds <- newCountDataSet(countTable, condition)
 cds <- estimateSizeFactors(cds)
 
