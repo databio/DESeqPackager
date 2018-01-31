@@ -1,9 +1,12 @@
 #' packages multiple data tables into one data frame for DESeq analysis
 #'
 #' @param yaml file path to project's yaml
+#' @param data_source title of the sample annotation sheet column with file names
+#' @param gene_name_col name of the column with unique gene identifiers
+#' @param relevant_data_col name of the column with the relevant data for DESeq
 #' @return countTable, the data structure needed for DESeq
 #' @export
-DESeq_table_maker <- function(yaml, data_source){
+DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_col){
   
   #importing pepr project
   devtools::install_github("pepkit/pepr")
@@ -13,41 +16,49 @@ DESeq_table_maker <- function(yaml, data_source){
   files <- sample_frame[ , data_source]
   type <- sample_frame[ , sample_name]
   
-  #prompting user to specify columns for DESeq Analysis
-  gene_name_col <- readline(prompt= "Specify which column in each data table is the gene name column: ")
-  relevant_data_col <- readline(prompt= "Specify which column contains the relevant data for DESeq analysis: ")
+  dt_list <- vector(mode="list",length=length(files))
   
-  print("Packaging...")
-  
-  #reading in the files
-  df_list <- vector(mode="list", length=length(files))
-  for(i in 1:length(files)){
-    sampleTable <- read.table(files[i], header = TRUE)
-    sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
-    sampleTable[[2]] <- as.integer(sampleTable[[2]]) #integers are required for DESeq
-    names(sampleTable)[2] <- type[i]
-    df_list[[i]] <- sampleTable
+  #checking for data table dependency and reading in files
+  if (requireNamespace("data.table")) {
+    print("in fread")
+    for(i in 1:length(files)){
+      sampleTable <- data.table::fread(files[i])
+      sampleTable <- sampleTable[, .(get(gene_name_col), get(relevant_data_col))]
+      sampleTable[[2]] <- as.integer(sampleTable[[2]])
+      names(sampleTable)[1] <- gene_name_col
+      names(sampleTable)[2] <- type[i]
+      dt_list[[i]] <- sampleTable
+    }
+  } else {
+    print("in read.table")
+    for(i in 1:length(files)){
+      sampleTable <- read.table(files[i], header = TRUE)
+      sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
+      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #integers are required for DESeq
+      names(sampleTable)[2] <- type[i]
+      df_list[[i]] <- sampleTable
+    }
   }
-  
+  print("done reading")
   #function to merge the datatables in the list
-  countTable <- merge(df_list[[1]], df_list[[2]], by = gene_name_col)
-  for(i in 3:length(df_list)){
-    countTable <- merge(countTable, df_list[[i]])
+  countTable <- merge(dt_list[[1]], dt_list[[2]], by = gene_name_col)
+  for(i in 3:length(dt_list)){
+    countTable <- merge(countTable, dt_list[[i]])
   }
-
+  
   #set the row names as the gene names, then remove the gene name column
   row.names(countTable) <- countTable[[1]]
   countTable[,1] <- NULL
-  
-  print("Finished! View the new data frame in the variable called 'countTable'")
+
   return(countTable)
 }
 
-countTable <- DESeq_table_maker("Documents/GitHub/DESeq-Packager/project_config.yaml", "data_source")
+countTable <- DESeq_table_maker("project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
 
 
 
-#-----------------DESeq Analysis-------------------------#
+#------------------------------DESeq Analysis-----------------------------------#
+
 #the user will conduct the DESeq analysis themselves
 #this code is for my testing purposes
 source("https://bioconductor.org/biocLite.R")
