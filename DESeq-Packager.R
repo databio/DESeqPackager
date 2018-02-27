@@ -6,7 +6,7 @@
 #' @param relevant_data_col name of the column with the relevant data for DESeq
 #' @return countTable, the data structure needed for DESeq
 #' @export
-DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_col){
+DESeq_Packager <- function(yaml, data_source, gene_name_col, relevant_data_col){
   
   #importing pepr project
   devtools::install_github("pepkit/pepr")
@@ -18,13 +18,13 @@ DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_co
   
   dt_list <- vector(mode="list",length=length(files))
   
-  #checking for data table dependency and reading in files
+  #checking for data table dependency and reading in files into a list
   if (requireNamespace("data.table")) {
     print("in fread")
     for(i in 1:length(files)){
       sampleTable <- data.table::fread(files[i])
       sampleTable <- sampleTable[, .(get(gene_name_col), get(relevant_data_col))]
-      sampleTable[[2]] <- as.integer(sampleTable[[2]])
+      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #DESeq requires integers
       names(sampleTable)[1] <- gene_name_col
       names(sampleTable)[2] <- type[i]
       dt_list[[i]] <- sampleTable
@@ -34,12 +34,14 @@ DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_co
     for(i in 1:length(files)){
       sampleTable <- read.table(files[i], header = TRUE)
       sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
-      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #integers are required for DESeq
+      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #DESeq requires integers
+      names(sampleTable)[1] <- gene_name_col
       names(sampleTable)[2] <- type[i]
-      df_list[[i]] <- sampleTable
+      dt_list[[i]] <- sampleTable
     }
   }
   print("done reading")
+  
   #function to merge the datatables in the list
   countTable <- merge(dt_list[[1]], dt_list[[2]], by = gene_name_col)
   for(i in 3:length(dt_list)){
@@ -53,7 +55,7 @@ DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_co
   return(countTable)
 }
 
-countTable <- DESeq_table_maker("project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
+countTable <- DESeq_table_maker("~/Documents/DESeq-Packager/project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
 
 
 
