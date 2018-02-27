@@ -53,7 +53,7 @@ DESeq_table_maker <- function(yaml, data_source, gene_name_col, relevant_data_co
   return(countTable)
 }
 
-countTable <- DESeq_table_maker("project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
+countTable <- DESeq_table_maker("${PROCESSED}/DESeq-Packager/project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
 
 
 
