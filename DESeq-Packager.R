@@ -1,62 +1,58 @@
-#' packages multiple data tables into one data frame for DESeq analysis
+#' Packages RNA sequencing results from multiple data files into one data frame for DESeq analysis using the PEP format
+#' (read more about the PEP format at https://pepkit.github.io/)
 #'
-#' @param yaml file path to project's yaml
-#' @param data_source title of the sample annotation sheet column with file names
-#' @param gene_name_col name of the column with unique gene identifiers
-#' @param relevant_data_col name of the column with the relevant data for DESeq
-#' @return countTable, the data structure needed for DESeq
+#' @param yaml file path to project_config yaml
+#' @param data_source name of the column in the sample annotation sheet with the file names
+#' @param gene_names name of the column in each data file with gene names
+#' @param gene_counts name of the column in each data file with the count data for DESeq
+#' @return countDataSet, the data frame needed for DESeq
 #' @export
-DESeq_Packager <- function(yaml, data_source, gene_name_col, relevant_data_col){
-  
-  #importing pepr project
-  devtools::install_github("pepkit/pepr")
-  library(pepr)
-  p <- Project(file = yaml)
-  sample_frame <- samples(p)
+DESeq_Packager <- function(yaml, data_source, gene_names, gene_counts){
+  if(!requireNamespace("pepr"))
+    devtools::install_github("pepkit/pepr")
+  p <- pepr::Project(file = yaml)
+  sample_frame <- pepr::samples(p)
+  sample_names <- sample_frame[["sample_name"]]
   files <- sample_frame[ , data_source]
-  type <- sample_frame[ , sample_name]
-  
-  dt_list <- vector(mode="list",length=length(files))
   
   #checking for data table dependency and reading in files into a list
-  if (requireNamespace("data.table")) {
-    print("in fread")
-    for(i in 1:length(files)){
-      sampleTable <- data.table::fread(files[i])
-      sampleTable <- sampleTable[, .(get(gene_name_col), get(relevant_data_col))]
-      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #DESeq requires integers
-      names(sampleTable)[1] <- gene_name_col
-      names(sampleTable)[2] <- type[i]
-      dt_list[[i]] <- sampleTable
-    }
-  } else {
-    print("in read.table")
-    for(i in 1:length(files)){
-      sampleTable <- read.table(files[i], header = TRUE)
-      sampleTable <- sampleTable[, c(gene_name_col, relevant_data_col)]
-      sampleTable[[2]] <- as.integer(sampleTable[[2]]) #DESeq requires integers
-      names(sampleTable)[1] <- gene_name_col
-      names(sampleTable)[2] <- type[i]
-      dt_list[[i]] <- sampleTable
-    }
+  if (!requireNamespace("data.table")) {
+    install.packages("data.table")
   }
-  print("done reading")
+  library(data.table)
   
-  #function to merge the datatables in the list
-  countTable <- merge(dt_list[[1]], dt_list[[2]], by = gene_name_col)
+  print("reading in tables...")
+  
+  #create a table for a sample, then put it into a list
+  dt_list <- vector(mode="list",length=length(files))
+  for(i in 1:length(files)){
+    sampleTable <- fread(files[i])
+    sampleTable <- sampleTable[, c(gene_names, gene_counts), with=FALSE]
+    sampleTable[[gene_counts]] <- lapply(sampleTable[[gene_counts]], as.integer)
+    colnames(sampleTable)[1] <- gene_names
+    colnames(sampleTable)[2] <- sample_names[i]
+    dt_list[[i]] <- sampleTable
+  }
+  
+  print("merging samples into one table...")
+  
+  #join each sample table from the list
+  countDataSet <- merge(dt_list[[1]], dt_list[[2]])
   for(i in 3:length(dt_list)){
-    countTable <- merge(countTable, dt_list[[i]])
+    countDataSet <- merge(countDataSet, dt_list[[i]])
   }
   
   #set the row names as the gene names, then remove the gene name column
-  row.names(countTable) <- countTable[[1]]
-  countTable[,1] <- NULL
-
-  return(countTable)
+  row.names(countDataSet) <- countDataSet[[1]]
+  countDataSet[,1] <- NULL
+  
+  print("packaged!")
+  return(countDataSet)
 }
 
 
-countTable <- DESeq_table_maker("${PROCESSED}/DESeq-Packager/project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
+#test
+countDataSet <- DESeq_Packager("~/Documents/Databio/DESeq-Packager/project_config.yaml", "data_source", "ensembl_gene_id", "FPKM")
 
 
 
@@ -71,7 +67,7 @@ library("DESeq")
 
 
 condition <- factor(c("controlDMSO","controlDMSO","knockoutDMSO","knockoutDMSO"))
-cds <- newCountDataSet(countTable, condition)
+cds <- newCountDataSet(countDataSet, condition)
 cds <- estimateSizeFactors(cds)
 
 cds <- estimateDispersions(cds, fitType = "local")
