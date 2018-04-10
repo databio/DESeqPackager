@@ -8,18 +8,20 @@
 #' @return countDataSet, the data frame needed for DESeq
 #' @export
 DESeq_Packager <- function(yaml, data_source, gene_names, gene_counts){
+  #checking for data table dependency
+  if(!requireNamespace("devtools"))
+    install.packages("devtools", dependencies=TRUE)
   if(!requireNamespace("pepr"))
-    devtools::install_github("pepkit/pepr")
+    devtools::install_github("pepkit/pepr", dependencies=TRUE)
+  if (!requireNamespace("data.table")) {
+    install.packages("data.table", dependencies=TRUE)
+  }
+  library(data.table)
   p <- pepr::Project(file = yaml)
   sample_frame <- pepr::samples(p)
   sample_names <- sample_frame[["sample_name"]]
   files <- sample_frame[ , data_source]
   
-  #checking for data table dependency and reading in files into a list
-  if (!requireNamespace("data.table")) {
-    install.packages("data.table")
-  }
-  library(data.table)
   
   print("reading in tables...")
   
@@ -47,6 +49,5 @@ DESeq_Packager <- function(yaml, data_source, gene_names, gene_counts){
   countDataSet[,1] <- NULL
   
   print("packaged!")
-  save("countDataSet", file="~/Documents/Databio/DESeq-Packager/.RData")
   return(countDataSet)
 }
