@@ -47,5 +47,6 @@ DESeq_Packager <- function(yaml, data_source, gene_names, gene_counts){
   countDataSet[,1] <- NULL
   
   print("packaged!")
+  save("countDataSet", file="~/Documents/Databio/DESeq-Packager/.RData")
   return(countDataSet)
 }
