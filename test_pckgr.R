@@ -1,11 +1,18 @@
-Sys.setenv(CODEBASE="~/Documents/")
+Sys.setenv(CODEBASE="~/Documents/") #SET THIS TO THE LOCATION OF YOUR DESeq-Packager DIRECTORY
 src <- paste(Sys.getenv("CODEBASE"),"DESeq-Packager/DESeq-Packager.R", sep="")
-source(src)
+source(src) #load the function into this working environment
 
-project_config = paste(Sys.getenv("CODEBASE"), "DESeq-Packager/project_config.yaml", sep="")
-countDataSet <- DESeq_Packager(project_config, "data_source", "ensembl_gene_id", "FPKM")
+if(!requireNamespace("pepr"))
+  devtools::install_github("pepkit/pepr", dependencies=TRUE)
+yaml = paste(Sys.getenv("CODEBASE"), "DESeq-Packager/project_config.yaml", sep="")
+p <- pepr::Project(file = yaml)
+countDataSet <- DESeq_Packager(p, "data_source", "ensembl_gene_id", "FPKM")
+
 save("countDataSet", file=paste(Sys.getenv("CODEBASE"),"DESeq-Packager/.RData", sep=""))
 
+
+
+#-----------------------------------------------------
 
 # after running DESeq_Packager, the user will conduct the DESeq analysis themselves
 # you can try a sample DESeq analysis by uncommenting the code below

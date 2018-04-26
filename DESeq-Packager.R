@@ -1,23 +1,22 @@
-#' Packages RNA sequencing results from multiple data files into one data frame for DESeq analysis using the PEP format
+#' Packages RNA sequencing results from multiple data files in PEP format into one data table for DESeq analysis
 #' (read more about the PEP format at https://pepkit.github.io/)
 #'
-#' @param yaml file path to project_config yaml
-#' @param data_source name of the column in the sample annotation sheet with the file names
-#' @param gene_names name of the column in each data file with gene names
-#' @param gene_counts name of the column in each data file with the count data for DESeq
+#' @param p the pepr project
+#' @param data_source name of the column in the sample annotation sheet with the path to the files
+#' @param gene_names name of the column in each sample data file with gene names
+#' @param gene_counts name of the column in each sample data file with the count data for DESeq
 #' @return countDataSet, the data frame needed for DESeq
 #' @export
-DESeq_Packager <- function(yaml, data_source, gene_names, gene_counts){
+DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
   #checking for data table dependency
   if(!requireNamespace("devtools"))
     install.packages("devtools", dependencies=TRUE)
   if(!requireNamespace("pepr"))
     devtools::install_github("pepkit/pepr", dependencies=TRUE)
-  if (!requireNamespace("data.table")) {
+  if (!requireNamespace("data.table"))
     install.packages("data.table", dependencies=TRUE)
-  }
   library(data.table)
-  p <- pepr::Project(file = yaml)
+  
   sample_frame <- pepr::samples(p)
   sample_names <- sample_frame[["sample_name"]]
   files <- sample_frame[ , data_source]
