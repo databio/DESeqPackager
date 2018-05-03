@@ -2,6 +2,8 @@ Sys.setenv(CODEBASE="~/Documents/") #SET THIS TO THE LOCATION OF YOUR DESeq-Pack
 src <- paste(Sys.getenv("CODEBASE"),"DESeq-Packager/DESeq-Packager.R", sep="")
 source(src) #load the function into this working environment
 
+if(!requireNamespace("devtools"))
+  install.packages("devtools", dependencies=TRUE)
 if(!requireNamespace("pepr"))
   devtools::install_github("pepkit/pepr", dependencies=TRUE)
 yaml = paste(Sys.getenv("CODEBASE"), "DESeq-Packager/project_config.yaml", sep="")
