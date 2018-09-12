@@ -8,13 +8,6 @@
 #' @return countDataSet, the data frame needed for DESeq
 #' @export
 DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
-  #checking for data table dependency
-  if(!requireNamespace("devtools"))
-    install.packages("devtools", dependencies=TRUE)
-  if(!requireNamespace("pepr"))
-    devtools::install_github("pepkit/pepr", dependencies=TRUE)
-  if (!requireNamespace("data.table"))
-    install.packages("data.table", dependencies=TRUE)
   library(data.table)
   
   sample_frame <- pepr::samples(p)
@@ -22,7 +15,7 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
   files <- sample_frame[ , data_source]
   
   
-  print("reading in tables...")
+  message("reading in tables...")
   
   #create a table for a sample, then put it into a list
   dt_list <- vector(mode="list")
@@ -34,7 +27,7 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
       error=function(e) e
     )
     if(inherits(fnferror, "error" )){
-      print(paste("Skipping missing file", sample_names[i]))
+      message(paste("skipping missing file", sample_names[i]))
       next
     }
     sampleTable <- sampleTable[, c(gene_names, gene_counts), with=FALSE]
@@ -45,7 +38,7 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
     pos <- pos+1
   }
   
-  print("merging samples into one table...")
+  message("merging samples into one table...")
   
   #join each sample table from the list
   countDataSet <- merge(dt_list[[1]], dt_list[[2]])
@@ -53,6 +46,6 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
     countDataSet <- merge(countDataSet, dt_list[[i]])
   }
   
-  print("packaged!")
+  message("packaged!")
   return(countDataSet)
 }
