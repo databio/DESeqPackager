@@ -1,4 +1,4 @@
-Sys.setenv(CODEBASE="~/Documents/") #SET THIS TO THE LOCATION OF YOUR DESeq-Packager DIRECTORY
+Sys.setenv(CODEBASE="~/Desktop/UVA/Databio/") #SET THIS TO THE LOCATION OF YOUR DESeq-Packager DIRECTORY
 src <- paste(Sys.getenv("CODEBASE"),"DESeq-Packager/DESeq-Packager.R", sep="")
 source(src) #load the function into this working environment
 

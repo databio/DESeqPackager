@@ -8,6 +8,15 @@
 #' @return countDataSet, the data frame needed for DESeq
 #' @export
 DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
+  if(!requireNamespace("devtools")){
+    error("devtools package required")
+  }
+  if(!requireNamespace("pepr")){
+    error("pepr package required")
+  }
+  if(!requireNamespace("data.table")){
+    error("data.table package required")
+  }
   library(data.table)
   
   sample_frame <- pepr::samples(p)
@@ -19,23 +28,21 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
   
   #create a table for a sample, then put it into a list
   dt_list <- vector(mode="list")
-  pos <- 1
-  #dt_list <- vector(mode="list",length=length(files))
+  #pos <- 1
   for(i in 1:length(files)){
     fnferror <- tryCatch(
       sampleTable <- fread(files[i]),
       error=function(e) e
     )
     if(inherits(fnferror, "error" )){
-      message(paste("skipping missing file", sample_names[i]))
+      message("skipping missing file", sample_names[i])
       next
     }
     sampleTable <- sampleTable[, c(gene_names, gene_counts), with=FALSE]
     sampleTable[[gene_counts]] <- lapply(sampleTable[[gene_counts]], as.integer)
     colnames(sampleTable)[1] <- gene_names
     colnames(sampleTable)[2] <- sample_names[i]
-    dt_list[[pos]] <- sampleTable
-    pos <- pos+1
+    dt_list[[i]] <- sampleTable
   }
   
   message("merging samples into one table...")
