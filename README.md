@@ -5,14 +5,12 @@ From Aaron Gu
 
 DESeq-Packager takes in an RNA-seq project in [PEP format](https://pepkit.github.io/docs/pepr/) and combines the data for each sample into a DESeq countDataSet structure. Best used with output from the [rnapipe](https://github.com/databio/rnapipe) pipeline.
 
-## Required Packages
+### Required Packages
 
-- devtools
 - pepr
 - data.table
 
 ## Quick Start
 
-The test_pckgr.Rmd file contains the instructions to use the DESeq-Packager function. In a few seconds, DESeq-Packager will produce a countDataSet ready for subsequent DESeq analysis.
-
+The test_pckgr.html file contains the instructions to use the DESeq-Packager function. In a few seconds, DESeq-Packager will produce a countDataSet ready for subsequent DESeq analysis.
 
