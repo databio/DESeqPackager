@@ -4,4 +4,4 @@ metadata:
 derived_columns: [data_source]
 
 data_sources:
-  source1: "${CODEBASE}/DESeq-Packager/expr_tsv/RNA_EWS-FLI1_{ews_fli1}_{treatment_drug}_rep{rep}.tsv"
+  source1: "./expr_tsv/RNA_EWS-FLI1_{ews_fli1}_{treatment_drug}_rep{rep}.tsv"

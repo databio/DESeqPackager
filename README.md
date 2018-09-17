@@ -13,6 +13,6 @@ DESeq-Packager takes in an RNA-seq project in [PEP format](https://pepkit.github
 
 ## Quick Start
 
-To try it on the example data provided, clone the Git repository. Open up the test_pckgr.R file and change the `CODEBASE` R environment variable to the location of your DESeq-Packager directory, and then run the next 4 lines of code. In a few seconds, DESeq-Packager will produce a the countDataSet ready for subsequent DESeq analysis.
+The test_pckgr.Rmd file contains the instructions to use the DESeq-Packager function. In a few seconds, DESeq-Packager will produce a countDataSet ready for subsequent DESeq analysis.
 
-To run the test from the command line, use the command `R < test_pckgr.R --no-save`. The countDataSet result should be saved to the .R_Data file.
+

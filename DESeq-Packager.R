@@ -28,20 +28,19 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
   
   #create a table for a sample, then put it into a list
   dt_list <- vector(mode="list")
-  #pos <- 1
   for(i in 1:length(files)){
     fnferror <- tryCatch(
-      sampleTable <- fread(files[i]),
+      sampleTable <- fread(files[[i]]),
       error=function(e) e
     )
-    if(inherits(fnferror, "error" )){
-      message("skipping missing file", sample_names[i])
+    if(inherits(fnferror, "error")){
+      warning("skipping missing file ", files[i], " for sample ", sample_names[i])
       next
     }
     sampleTable <- sampleTable[, c(gene_names, gene_counts), with=FALSE]
     sampleTable[[gene_counts]] <- lapply(sampleTable[[gene_counts]], as.integer)
     colnames(sampleTable)[1] <- gene_names
-    colnames(sampleTable)[2] <- sample_names[i]
+    colnames(sampleTable)[2] <- sample_names[[i]]
     dt_list[[i]] <- sampleTable
   }
   
