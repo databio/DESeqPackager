@@ -12,5 +12,4 @@ DESeq-Packager takes in an RNA-seq project in [PEP format](https://pepkit.github
 
 ## Quick Start
 
-The test_pckgr.html file contains the instructions to use the DESeq-Packager function. In a few seconds, DESeq-Packager will produce a countDataSet ready for subsequent DESeq analysis.
-
+The test_pckgr.html file contains the instructions on how to use the DESeq-Packager function with a sample data set. In a few seconds, DESeq-Packager will produce a countDataSet ready for subsequent DESeq analysis.
