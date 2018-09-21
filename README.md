@@ -21,7 +21,7 @@ In a new R file, load in the function
 source("DESeq-Packager.R")
 ```
 
-Construct a pepr project using the yaml
+Construct a pepr project using the yaml located in this repository
 ```R
 p = pepr::Project(file="project_config.yaml")
 ```
