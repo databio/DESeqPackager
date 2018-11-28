@@ -3,6 +3,6 @@ metadata:
 
 derived_columns: [data_source]
 bioconductor:
-  read_fun_name: parseEncodeRegions
+  read_fun_name: DESeq_Packager
 data_sources:
   source1: "./expr_tsv/RNA_EWS-FLI1_{ews_fli1}_{treatment_drug}_rep{rep}.tsv"
