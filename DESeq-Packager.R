@@ -18,7 +18,7 @@ DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
     error("data.table package required")
   }
   library(data.table)
-  
+
   sample_frame <- pepr::samples(p)
   sample_names <- sample_frame[["sample_name"]]
   files <- sample_frame[ , data_source]

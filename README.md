@@ -14,7 +14,7 @@ DESeq-Packager takes in an RNA-seq project in [PEP format](https://pepkit.github
 
 ## Quick Start
 
-The quick start uses sample gene expression data available for download at `expr_tsv.tar.gz` from big.databio.org/example_data/
+The quick start uses sample gene expression data available for download at `expr_tsv.tar.gz` from http://big.databio.org/example_data/deseq_packager/
 
 In a new R file, load in the function
 ```R
@@ -29,4 +29,14 @@ p = pepr::Project(file="project_config.yaml")
 Run DESeq-Packager
 ```R
 countDataSet <- DESeq_Packager(p, "data_source", "ensembl_gene_id", "FPKM")
+```
+
+### Running DESeq-Packager with BioConductor
+
+[BioConductor Project](http://code.databio.org/BiocProject/index.html)
+
+```R
+bpArgs = BiocProject(file="project_config.yaml", funcArgs=list(data_source="data_source", gene_names="ensembl_gene_id", gene_counts="FPKM"))
+
+getData(bpArgs)
 ```

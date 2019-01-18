@@ -1,6 +1,10 @@
 metadata:
   sample_annotation: table_experiments_RNA.csv
 
+bioconductor:
+  read_fun_name: DESeq_Packager
+  read_fun_path: DESeq-Packager.R
+
 derived_columns: [data_source]
 
 data_sources:
