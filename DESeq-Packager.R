@@ -9,13 +9,13 @@
 #' @export
 DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
   if(!requireNamespace("devtools")){
-    error("devtools package required")
+    stop("devtools package required")
   }
   if(!requireNamespace("pepr")){
-    error("pepr package required")
+    stop("pepr package required")
   }
   if(!requireNamespace("data.table")){
-    error("data.table package required")
+    stop("data.table package required")
   }
   library(data.table)
 

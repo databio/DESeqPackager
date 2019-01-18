@@ -33,7 +33,7 @@ countDataSet <- DESeq_Packager(p, "data_source", "ensembl_gene_id", "FPKM")
 
 ### Running DESeq-Packager with BioConductor
 
-[BioConductor Project](http://code.databio.org/BiocProject/index.html)
+[BiocProject](http://code.databio.org/BiocProject/index.html) is another way to read in biological data in the PEP format. It can load both project metadata and sample data in a single line of code.
 
 ```R
 bpArgs = BiocProject(file="project_config.yaml", funcArgs=list(data_source="data_source", gene_names="ensembl_gene_id", gene_counts="FPKM"))
