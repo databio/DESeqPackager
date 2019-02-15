@@ -7,7 +7,7 @@
 #' @param gene_counts name of the column in each sample data file with the count data for DESeq
 #' @return countDataSet, the data frame needed for DESeq
 #' @export
-DESeq_Packager <- function(p, data_source, gene_names, gene_counts){
+DESeqPackager <- function(p, data_source, gene_names, gene_counts){
   if(!requireNamespace("devtools")){
     stop("devtools package required")
   }
